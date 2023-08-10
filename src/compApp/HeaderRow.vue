@@ -3,17 +3,19 @@
 import HeaderText from './HeaderText.vue'
 import HeaderTag from './HeaderTag.vue'
 
-const title = "Title";
-const artist = "Artist(s)";
-const length = "Length";
-const genre = "Genre";
+defineProps({
+    title: String,
+    artist: String,
+    duration: Number,
+    genre: String
+});
 </script>
 
 <template>
     <tr class="header">
         <th><HeaderText :placeholder=title></HeaderText></th>
         <th><HeaderText :placeholder=artist></HeaderText></th>
-        <th>{{ length }}</th>
+        <th>{{ duration }}</th>
         <th><HeaderTag :name=genre></HeaderTag></th>
     </tr>
 </template>

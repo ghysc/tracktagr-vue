@@ -3,23 +3,39 @@
 // import { useCollection } from 'vuefire'
 // import { collection } from 'firebase/firestore'
 import { ref } from 'vue'
-import HeaderRow from './components/HeaderRow.vue'
-import TrackRow from './components/TrackRow.vue'
+import AuthDialog from './compGlob/AuthDialog.vue'
+import HeaderRow from './compApp/HeaderRow.vue'
+import TrackRow from './compApp/TrackRow.vue'
+
+const title = "Title";
+const artist = "Artist(s)";
+const duration = "Duration";
+const genre = "Genre";
 
 // const todos = useCollection(collection(db, 'tracks'));
 const trackList = ref([
-  { id: 0, title: 'Setting Sun', artist: 'George FitzGerald', length: '6:14', genre: 'Rap' },
-  { id: 1, title: 'mirage', artist: 'sir bennett', length: '2:45', genre: 'Classic' }
+  { id: 0, title: 'Setting Sun', artist: 'George FitzGerald', duration: 374, genre: 'Rap' },
+  { id: 1, title: 'mirage', artist: 'sir bennett', duration: 165, genre: 'Classic' }
 ]);
 </script>
 
 <template>
+  <header>
+    <img src="./assets/logo.png">
+    <AuthDialog></AuthDialog>
+  </header>
+
   <table id="table">
-    <HeaderRow></HeaderRow>
+    <HeaderRow 
+    :title=title
+    :artist=artist
+    :duration=duration
+    :genre=genre></HeaderRow>
+
     <TrackRow v-for="track in trackList" 
     :title="track.title" 
     :artist="track.artist" 
-    :length="track.length"
+    :duration="track.duration"
     :genre="track.genre" 
     :key="track.id"></TrackRow>
   </table>

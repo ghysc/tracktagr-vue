@@ -12,7 +12,7 @@ defineProps({
     <tr class="track">
         <td>{{ title }}</td>
         <td>{{ artist }}</td>
-        <td>{{ length }}</td>
+        <td>{{ Math.trunc(length / 60) }}:{{ (length % 60) }}</td>
         <td>{{ genre }}</td>
     </tr>
 </template>
