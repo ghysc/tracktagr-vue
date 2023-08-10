@@ -29,7 +29,7 @@ function signinPopup() {
 </script>
 
 <template>
-    <button @click="signinPopup()">SignIn with Google</button>
+    <button @click="signinPopup">Sign in with Google</button>
 </template>
 
 <style></style>

@@ -12,24 +12,25 @@ import AuthEmailPassword from './AuthEmailPassword.vue'
 import AuthGoogle from './AuthGoogle.vue'
 
 // const vuefireAuth = useFirebaseAuth();
-const dialog = ref(null);
+const dialogElement = ref(null);
 
 function onSuccess() {
-    dialog.value.close();
+    dialogElement.value.close();
     // TODO some other feedbacks
 }
 </script>
 
 <template>
-    <dialog ref="dialog">
+    <dialog ref="dialogElement">
         <AuthEmailPassword @onSuccess="onSuccess"></AuthEmailPassword>
-
+        <br/>
         <AuthGoogle @onSuccess="onSuccess"></AuthGoogle>
-        
-        <button @click="dialog.close()">Close</button>
+        <br/>
+        <br/>
+        <button @click="dialogElement.close()">Close</button>
     </dialog>
 
-    <button @click="dialog.showModal()">Sign in</button>
+    <button @click="dialogElement.showModal()">Sign in</button>
 </template>
 
 <style>

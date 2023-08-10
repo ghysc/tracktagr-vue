@@ -4,12 +4,13 @@ import { ref } from 'vue'
 import {
     fetchSignInMethodsForEmail,
     signInWithEmailAndPassword,
-    // createUserWithEmailAndPassword,
+    createUserWithEmailAndPassword
 } from 'firebase/auth'
 import {
     useFirebaseAuth
 } from 'vuefire'
 import InputEmail from './InputEmail.vue'
+import InputPasswordNewUser from './InputPasswordNewUser.vue'
 import InputPassword from './InputPassword.vue'
 
 const emits = defineEmits(['onSuccess', 'onFailure']);
@@ -39,7 +40,21 @@ function validateEmail(emailParam) {
     enteringEmail.value = false;
 }
 
-function validatePassword(passwordParam) {
+function createUserEmailAndPassword(passwordParam) {
+    createUserWithEmailAndPassword(vuefireAuth, email.value, passwordParam.value)
+        .then((userCredential) => {
+            // Signed in
+            emits('onSuccess', userCredential);
+        })
+        .catch((error) => {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            emits('onFailure');
+            console.error(errorMessage + ' : ' + errorCode);
+        });
+}
+
+function signInEmailAndPassword(passwordParam) {
     signInWithEmailAndPassword(vuefireAuth, email.value, passwordParam.value)
         .then((userCredential) => {
             // Signed in!
@@ -52,43 +67,23 @@ function validatePassword(passwordParam) {
             console.error(errorMessage + ' : ' + errorCode);
         });
 }
-
-// function createUserEmailAndPassword() {
-//     createUserWithEmailAndPassword(vuefireAuth, email, password)
-//         .then((userCredential) => {
-//             // Signed in
-//             const user = userCredential.user;
-//             console.log(user + " is now connected!");
-//             // ...
-//         })
-//         .catch((error) => {
-//             const errorCode = error.code;
-//             const errorMessage = error.message;
-//             console.error(errorMessage + ' : ' + errorCode);
-//         });
-// }
 </script>
 
 <template>
-    <form method="post">
-
-        <div v-if="enteringEmail">
-            Welcome to TrackTagr
-            <InputEmail @validate="validateEmail"></InputEmail>
+    <div v-if="enteringEmail">
+        Welcome to TrackTagr
+        <InputEmail @validate="validateEmail"></InputEmail>
+    </div>
+    <div v-else>
+        <div v-if="newUser">
+            Welcome new user
+            <InputPasswordNewUser @validate="createUserEmailAndPassword"></InputPasswordNewUser>
         </div>
         <div v-else>
-            <div v-if="newUser">
-                Welcome new user
-                <InputPassword @validate="validatePassword"></InputPassword>
-                <InputPassword @validate="validatePassword"></InputPassword>
-            </div>
-            <div v-else>
-                Welcome back
-                <InputPassword @validate="validatePassword"></InputPassword>
-            </div>
+            Welcome back
+            <InputPassword @validate="signInEmailAndPassword"></InputPassword>
         </div>
-
-    </form>
+    </div>
 </template>
 
 <style></style>

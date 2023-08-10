@@ -6,9 +6,9 @@ const email = ref('');
 
 const emit = defineEmits(['validate']);
 
-function next(e) {
+function next() {
     emit('validate', email);
-    e.preventDefault();
+    //e.preventDefault();
 }
 </script>
 

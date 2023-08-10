@@ -6,9 +6,9 @@ const password = ref('');
 
 const emit = defineEmits(['validate']);
 
-function submit(e) {
+function submit() {
     emit('validate', password);
-    e.preventDefault();
+    //e.preventDefault();
 }
 </script>
 
