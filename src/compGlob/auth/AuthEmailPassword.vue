@@ -24,17 +24,14 @@ const email = ref('');
 function validateEmail(emailParam) {
     fetchSignInMethodsForEmail(vuefireAuth, emailParam.value)
         .then((method) => {
-            if (method.length == 0)
+            if (method.includes("password") == false)
                 newUser.value = true;
             else
                 newUser.value = false;
             email.value = emailParam.value;
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            emits('onFailure');
-            console.error(errorMessage + ' : ' + errorCode);
+            emits('onFailure', error);
         });
 
     enteringEmail.value = false;
@@ -47,10 +44,7 @@ function createUserEmailAndPassword(passwordParam) {
             emits('onSuccess', userCredential);
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            emits('onFailure');
-            console.error(errorMessage + ' : ' + errorCode);
+            emits('onFailure', error);
         });
 }
 
@@ -61,10 +55,7 @@ function signInEmailAndPassword(passwordParam) {
             emits('onSuccess', userCredential);
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            emits('onFailure');
-            console.error(errorMessage + ' : ' + errorCode);
+            emits('onFailure', error);
         });
 }
 </script>

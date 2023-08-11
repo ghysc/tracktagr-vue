@@ -20,10 +20,7 @@ function signinPopup() {
             emits('onSuccess', userCredential);
         })
         .catch((error) => {
-            const errorCode = error.code;
-            const errorMessage = error.message;
-            emits('onFailure');
-            console.error(errorMessage + ' : ' + errorCode);
+            emits('onFailure', error);
         });
 }
 </script>

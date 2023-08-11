@@ -1,28 +1,72 @@
 
 <script setup>
-// import { useCollection } from 'vuefire'
-// import { collection } from 'firebase/firestore'
 import { ref } from 'vue'
-import AuthDialog from './compGlob/AuthDialog.vue'
+import { db } from './firebase'
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { 
+  ref as dbRef,
+  push,
+  set
+ } from 'firebase/database'
+import { 
+  // useFirebaseAuth,
+  // useDatabaseList,
+  // useDatabaseObject,
+  // getCurrentUser
+ } from 'vuefire'
+import AuthDialog from './compGlob/auth/AuthDialog.vue'
 import HeaderRow from './compApp/HeaderRow.vue'
 import TrackRow from './compApp/TrackRow.vue'
+
+// const vuefireAuth = useFirebaseAuth();
+const auth = getAuth();
 
 const title = "Title";
 const artist = "Artist(s)";
 const duration = "Duration";
 const genre = "Genre";
 
-// const todos = useCollection(collection(db, 'tracks'));
 const trackList = ref([
   { id: 0, title: 'Setting Sun', artist: 'George FitzGerald', duration: 374, genre: 'Rap' },
   { id: 1, title: 'mirage', artist: 'sir bennett', duration: 165, genre: 'Classic' }
 ]);
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    console.log("Firebase has user below");
+    const users = dbRef(db, 'users');
+    const newUser = push(users);
+    set(newUser, {
+      allo: "dread"
+    });
+    console.log(user);
+  } else {
+    console.log("Firebase no user");
+  }
+});
+
+//#region AUTH EMITS CALLBACKS
+function onAuthSignin(userCredential) {
+  // const users = ref(db, 'users');
+  // push(users);
+  // console.log(users);
+  console.log("User below signed in ");
+  console.log(userCredential);
+}
+
+function onAuthSignout() {
+}
+
+function onAuthFailure(error) {
+  console.error(error.code + ' : ' + error.message);
+}
+//#endregion
 </script>
 
 <template>
   <header>
     <img src="./assets/logo.png">
-    <AuthDialog></AuthDialog>
+    <AuthDialog @onSignin="onAuthSignin" @onSignout="onAuthSignout" @onFailure="onAuthFailure"></AuthDialog>
   </header>
 
   <table id="table">
