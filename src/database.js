@@ -2,6 +2,7 @@ import { db } from './firebase'
 import {
     doc,
     getDoc,
+    //onSnapshot,
     updateDoc,
     setDoc,
     Timestamp
@@ -9,26 +10,32 @@ import {
 
 async function loginUser(user) {
 
-    const docRef = doc(db, "users", user.uid);
-    const docSnap = await getDoc(docRef);
+    const userRef = doc(db, "users", user.uid);
+    let userSnap = await getDoc(userRef);
 
     // If the user exists
-    if (docSnap.exists()) {
-        await updateDoc(docRef, {
+    if (userSnap.exists()) {
+        await updateDoc(userRef, {
             lastConnectionDate: Timestamp.now()
         });
         console.log("User logged in in database.js");
     }
     // Else if it's a new user 
     else {
-        await setDoc(docRef, {
+        await setDoc(userRef, {
             mail: user.email,
-            creationDate: Timestamp.now(),
-            lastConnectionDate: Timestamp.now(),
+            tags: {
+                artist: "String",
+                duration: "Number",
+                title: "String"
+            },
             tier: 0
         });
         console.log("User created in database.js");
     }
+
+    userSnap = await getDoc(userRef);
+    return userSnap.data();
 
 }
 

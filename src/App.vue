@@ -1,9 +1,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { 
-  getAuth, 
-  onAuthStateChanged 
+import {
+  getAuth,
+  onAuthStateChanged
 } from "firebase/auth";
 import {
   loginUser
@@ -25,9 +25,9 @@ const trackList = ref([
 ]);
 
 // Callback method automatically called when Firebase Authentification state changes 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async user => {
   if (user) {
-    loginUser(user);
+    await loginUser(user);
   }
 });
 
@@ -51,33 +51,35 @@ function onAuthFailure(error) {
   </header>
 
   <table id="table">
-    <HeaderRow 
-    :title=title
-    :artist=artist
-    :duration=duration
-    :genre=genre></HeaderRow>
+    <HeaderRow :title=title :artist=artist :duration=duration :genre=genre></HeaderRow>
 
-    <TrackRow v-for="track in trackList" 
-    :title="track.title" 
-    :artist="track.artist" 
-    :duration="track.duration"
-    :genre="track.genre" 
-    :key="track.id"></TrackRow>
+    <TrackRow v-for="track in trackList" :title="track.title" :artist="track.artist" :duration="track.duration"
+      :genre="track.genre" :key="track.id"></TrackRow>
   </table>
 </template>
 
 <style>
-body {
-  background-color: #121212;
-}
-
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+}
+
+header {
+  height: 8vh;
+  background-color: #3a3a3a;
+  padding: 0px 50px;
+  margin-bottom: 10px;
+}
+
+header img {
+  float: left;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+body {
+  background-color: #121212;
 }
 
 #table {
@@ -88,7 +90,7 @@ body {
   /* Add a grey border */
   border: 1px solid #ddd;
   /* Increase font-size */
-  font-size: 18px; 
+  font-size: 18px;
   color: #ddd;
   margin-left: auto;
   margin-right: auto;
