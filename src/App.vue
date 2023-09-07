@@ -1,24 +1,17 @@
 
 <script setup>
 import { ref } from 'vue'
-import { db } from './firebase'
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { 
-  ref as dbRef,
-  push,
-  set
- } from 'firebase/database'
-import { 
-  // useFirebaseAuth,
-  // useDatabaseList,
-  // useDatabaseObject,
-  // getCurrentUser
- } from 'vuefire'
+  getAuth, 
+  onAuthStateChanged 
+} from "firebase/auth";
+import {
+  loginUser
+} from './database'
 import AuthDialog from './compGlob/auth/AuthDialog.vue'
 import HeaderRow from './compApp/HeaderRow.vue'
 import TrackRow from './compApp/TrackRow.vue'
 
-// const vuefireAuth = useFirebaseAuth();
 const auth = getAuth();
 
 const title = "Title";
@@ -31,27 +24,15 @@ const trackList = ref([
   { id: 1, title: 'mirage', artist: 'sir bennett', duration: 165, genre: 'Classic' }
 ]);
 
+// Callback method automatically called when Firebase Authentification state changes 
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    console.log("Firebase has user below");
-    const users = dbRef(db, 'users');
-    const newUser = push(users);
-    set(newUser, {
-      allo: "dread"
-    });
-    console.log(user);
-  } else {
-    console.log("Firebase no user");
+    loginUser(user);
   }
 });
 
 //#region AUTH EMITS CALLBACKS
-function onAuthSignin(userCredential) {
-  // const users = ref(db, 'users');
-  // push(users);
-  // console.log(users);
-  console.log("User below signed in ");
-  console.log(userCredential);
+function onAuthSignin() {
 }
 
 function onAuthSignout() {

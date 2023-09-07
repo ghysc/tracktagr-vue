@@ -13,21 +13,18 @@ const emits = defineEmits(['onSignin', 'onSignout', 'onFailure']);
 const dialogElement = ref(null);
 
 function onSignin(userCredential) {
-    console.log("Signin depuis AuthDialog");
     dialogElement.value.close();
     // TODO some other feedbacks
     emits('onSignin', userCredential);
 }
 
 function onSignout() {
-    console.log("Signout depuis AuthDialog");
     dialogElement.value.close();
     // TODO some other feedbacks
     emits('onSignout');
 }
 
 function onFailure(error) {
-    console.log("Failure depuis AuthDialog");
     emits('onFailure', error);
 }
 </script>
