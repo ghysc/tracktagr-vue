@@ -1,6 +1,9 @@
 
 <script setup>
-import { ref } from 'vue'
+import {
+  ref,
+  //watch 
+} from 'vue'
 import {
   getAuth,
   onAuthStateChanged
@@ -14,10 +17,7 @@ import TrackRow from './compApp/TrackRow.vue'
 
 const auth = getAuth();
 
-const title = "Title";
-const artist = "Artist(s)";
-const duration = "Duration";
-const genre = "Genre";
+const userTags = ref([]);
 
 const trackList = ref([
   { id: 0, title: 'Setting Sun', artist: 'George FitzGerald', duration: 374, genre: 'Rap' },
@@ -26,8 +26,24 @@ const trackList = ref([
 
 // Callback method automatically called when Firebase Authentification state changes 
 onAuthStateChanged(auth, async user => {
+  // If a user just logged in
   if (user) {
-    await loginUser(user);
+
+    // Add the user's tags
+    const userData = await loginUser(user);
+    userData.tags.forEach(tag => {
+      userTags.value.push(tag);
+    });
+
+  }
+  // If the user logged out
+  else {
+
+    // Empty the tags
+    while (userTags.value.length > 0) {
+      userTags.value.pop();
+    }
+
   }
 });
 
@@ -51,7 +67,7 @@ function onAuthFailure(error) {
   </header>
 
   <table id="table">
-    <HeaderRow :title=title :artist=artist :duration=duration :genre=genre></HeaderRow>
+    <HeaderRow :tags="userTags"></HeaderRow>
 
     <TrackRow v-for="track in trackList" :title="track.title" :artist="track.artist" :duration="track.duration"
       :genre="track.genre" :key="track.id"></TrackRow>

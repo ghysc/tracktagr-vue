@@ -3,9 +3,9 @@ import {
     doc,
     getDoc,
     //onSnapshot,
-    updateDoc,
+    //updateDoc,
     setDoc,
-    Timestamp
+    //Timestamp
 } from 'firebase/firestore'
 
 async function loginUser(user) {
@@ -15,20 +15,18 @@ async function loginUser(user) {
 
     // If the user exists
     if (userSnap.exists()) {
-        await updateDoc(userRef, {
-            lastConnectionDate: Timestamp.now()
-        });
         console.log("User logged in in database.js");
     }
     // Else if it's a new user 
     else {
         await setDoc(userRef, {
             mail: user.email,
-            tags: {
-                artist: "String",
-                duration: "Number",
-                title: "String"
-            },
+            tags: 
+            [
+                { label:"Title", type:"String", order:0 },
+                { label:"Artist(s)", type:"String", order:1 },
+                { label:"Duration", type:"Number", order:2 }
+            ],
             tier: 0
         });
         console.log("User created in database.js");
