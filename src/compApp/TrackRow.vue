@@ -1,19 +1,34 @@
 
 <script setup>
-defineProps({
-    title: String,
-    artist: String,
-    length: Number,
-    genre: String
+import {
+    computed
+} from 'vue'
+
+const props = defineProps({
+    tags: Array,
+    track: Array
 });
+
+// https://vuejs.org/guide/essentials/list.html#displaying-filtered-sorted-results
+const sortedTracks = computed(() => {
+    return props.track.slice().sort(compare);
+});
+
+// https://stackoverflow.com/questions/1129216/sort-array-of-objects-by-string-property-value
+function compare(a, b) {
+    const tagA = props.tags.find(tag => tag.id === a.key);
+    const tagB = props.tags.find(tag => tag.id === b.key);
+    if (tagA.order < tagB.order)
+        return -1;
+    else if (tagA.order > tagB.order)
+        return 1;
+    return 0;
+}
 </script>
 
 <template>
     <tr class="track">
-        <td>{{ title }}</td>
-        <td>{{ artist }}</td>
-        <td>{{ Math.trunc(length / 60) }}:{{ (length % 60) }}</td>
-        <td>{{ genre }}</td>
+        <td v-for="(track, index) in sortedTracks" :key=index>{{ track.value }}</td>
     </tr>
 </template>
 

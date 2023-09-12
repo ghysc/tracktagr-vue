@@ -2,48 +2,73 @@
 <script setup>
 import {
   ref,
-  //watch 
+  //watch
 } from 'vue'
 import {
   getAuth,
   onAuthStateChanged
 } from "firebase/auth";
-import {
-  loginUser
-} from './database'
+import DB from './database'
 import AuthDialog from './compGlob/auth/AuthDialog.vue'
 import HeaderRow from './compApp/HeaderRow.vue'
 import TrackRow from './compApp/TrackRow.vue'
 
 const auth = getAuth();
 
-const userTags = ref([]);
+let currentUser = undefined;
 
-const trackList = ref([
-  { id: 0, title: 'Setting Sun', artist: 'George FitzGerald', duration: 374, genre: 'Rap' },
-  { id: 1, title: 'mirage', artist: 'sir bennett', duration: 165, genre: 'Classic' }
-]);
+const userTags = ref([]);
+const defaultTags = [
+  { id: "title", label: "Title", type: "String", order: 0, },
+  { id: "artist", label: "Artist(s)", type: "String", order: 1 },
+  { id: "duration", label: "Duration", type: "Number", order: 2 }
+];
+
+const userTracks = ref([]);
+const track01 = {
+  id: 0,
+  tags: [
+    { key: "title", value: "Setting Sun" },
+    { key: "artist", value: "George FitzGerald" },
+    { key: "duration", value: 374 }
+  ]
+};
 
 // Callback method automatically called when Firebase Authentification state changes 
-onAuthStateChanged(auth, async user => {
-  // If a user just logged in
-  if (user) {
+onAuthStateChanged(auth, async userAuth => {
+  if (userAuth) {
+    currentUser = userAuth;
 
-    // Add the user's tags
-    const userData = await loginUser(user);
-    userData.tags.forEach(tag => {
+    // Try to get user
+    const userDB = await DB.retrieveUser(currentUser);
+
+    // If they doesn't exist, create them
+    if (userDB == undefined) {
+      await DB.createUser(currentUser, defaultTags);
+
+      // TEMP manually add default tracks
+      await DB.addTrack(currentUser, track01);
+    }
+
+    // Add user's tags to page
+    DB.processTags(currentUser, (tag) => {
       userTags.value.push(tag);
     });
 
+    // Add user's tracks to page
+    DB.processTracks(currentUser, (track) => {
+      userTracks.value.push(track.tags)
+    });
   }
-  // If the user logged out
   else {
-
     // Empty the tags
     while (userTags.value.length > 0) {
       userTags.value.pop();
     }
-
+    // Empty the tracks
+    while (userTracks.value.length > 0) {
+      userTracks.value.pop();
+    }
   }
 });
 
@@ -69,8 +94,7 @@ function onAuthFailure(error) {
   <table id="table">
     <HeaderRow :tags="userTags"></HeaderRow>
 
-    <TrackRow v-for="track in trackList" :title="track.title" :artist="track.artist" :duration="track.duration"
-      :genre="track.genre" :key="track.id"></TrackRow>
+    <TrackRow v-for="track in userTracks" :tags="userTags" :track=track :key=track.id></TrackRow>
   </table>
 </template>
 
