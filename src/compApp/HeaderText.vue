@@ -3,10 +3,16 @@
 defineProps({
     placeholder: String
 });
+
+const emit = defineEmits(['onInput']);
+
+function onInput(event) {
+    emit('onInput', event.target.value);
+}
 </script>
 
 <template>
-    <input type="search" class="search" :placeholder="placeholder"> <!--oninput="filterText(this)"-->
+    <input type="search" class="search" @input="event => onInput(event)" :placeholder="placeholder" /> <!--oninput="filterText(this)"-->
 </template>
 
 <style>

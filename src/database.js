@@ -50,8 +50,7 @@ async function processTracks(user, processing) {
 }
 
 async function addTrack(user, track) {
-    console.log(user.uid);
-    const trackRef = doc(db, 'users', user.uid + '/tracks/' + track.id.toString()); //doc(db, "users/" + user.uid + "/tracks/" + track.id);
+    const trackRef = doc(db, 'users', user.uid + '/tracks/' + track.id); //doc(db, "users/" + user.uid + "/tracks/" + track.id);
 
     await setDoc(trackRef, {
         tags: track.tags

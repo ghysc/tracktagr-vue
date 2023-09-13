@@ -2,6 +2,7 @@
 <script setup>
 import {
   ref,
+  computed
   //watch
 } from 'vue'
 import {
@@ -19,9 +20,9 @@ let currentUser = undefined;
 
 const userTags = ref([]);
 const defaultTags = [
-  { id: "title", label: "Title", type: "String", order: 0, },
-  { id: "artist", label: "Artist(s)", type: "String", order: 1 },
-  { id: "duration", label: "Duration", type: "Number", order: 2 }
+  { id: "title", label: "Title", type: "String", order: 0, filter: "" },
+  { id: "artist", label: "Artist(s)", type: "String", order: 1, filter: "" },
+  { id: "duration", label: "Duration", type: "Number", order: 2, filter: 0 }
 ];
 
 const userTracks = ref([]);
@@ -31,6 +32,14 @@ const track01 = {
     { key: "title", value: "Setting Sun" },
     { key: "artist", value: "George FitzGerald" },
     { key: "duration", value: 374 }
+  ]
+};
+const track02 = {
+  id: 1,
+  tags: [
+    { key: "title", value: "Otona Blue" },
+    { key: "artist", value: "Atarashii Gakko!" },
+    { key: "duration", value: 191 }
   ]
 };
 
@@ -48,6 +57,7 @@ onAuthStateChanged(auth, async userAuth => {
 
       // TEMP manually add default tracks
       await DB.addTrack(currentUser, track01);
+      await DB.addTrack(currentUser, track02);
     }
 
     // Add user's tags to page
@@ -72,6 +82,32 @@ onAuthStateChanged(auth, async userAuth => {
   }
 });
 
+const filteredTracks = computed(() => {
+  const tracks = userTracks.value.slice();
+  // Filtrer les pistes en fonction des tags et de leurs filtres correspondants
+  return tracks.filter((track) => {
+    return userTags.value.every((tag) => {
+      const trackTag = track.find((t) => t.key === tag.id);
+      // Comparer la valeur du tag dans la piste avec le filtre du tag utilisateur
+      switch (tag.type) {
+        case "String":
+          return trackTag.value.toLowerCase().includes(tag.filter.toLowerCase());
+        case "Number":
+          return Number(trackTag.value) >= Number(tag.filter);
+        default:
+          // Si le tag correspondant n'est pas trouvé dans la piste, inclure la piste
+          return true;
+      }
+    });
+  });
+});
+
+//#region HEADER FILTER CALLBACKS
+function onUpdateFilter(filter, tagID) {
+  userTags.value.find(tag => tag.id == tagID).filter = filter;
+}
+//#endregion
+
 //#region AUTH EMITS CALLBACKS
 function onAuthSignin() {
 }
@@ -92,9 +128,9 @@ function onAuthFailure(error) {
   </header>
 
   <table id="table">
-    <HeaderRow :tags="userTags"></HeaderRow>
+    <HeaderRow :tags="userTags" @onUpdateFilter="onUpdateFilter"></HeaderRow>
 
-    <TrackRow v-for="track in userTracks" :tags="userTags" :track=track :key=track.id></TrackRow>
+    <TrackRow v-for="track in filteredTracks" :tags="userTags" :track=track :key=track.id></TrackRow>
   </table>
 </template>
 

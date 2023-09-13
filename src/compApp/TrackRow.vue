@@ -3,6 +3,7 @@
 import {
     computed
 } from 'vue'
+import TrackDuration from './TrackDuration.vue'
 
 const props = defineProps({
     tags: Array,
@@ -28,7 +29,10 @@ function compare(a, b) {
 
 <template>
     <tr class="track">
-        <td v-for="(track, index) in sortedTracks" :key=index>{{ track.value }}</td>
+        <td v-for="(track, index) in sortedTracks" :key=index>
+            <div v-if="typeof track.value == 'string'">{{ track.value }}</div>
+            <TrackDuration v-else-if="typeof track.value == 'number'" :duration="track.value"></TrackDuration>
+        </td>
     </tr>
 </template>
 

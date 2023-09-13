@@ -10,6 +10,8 @@ const props = defineProps({
     tags: Array
 });
 
+const emit = defineEmits(['onUpdateFilter']);
+
 // https://vuejs.org/guide/essentials/list.html#displaying-filtered-sorted-results
 const sortedTags = computed(() => {
     return props.tags.slice().sort(compare);
@@ -31,7 +33,7 @@ function compare(a, b) {
     </tr> -->
     <tr class="header">
         <th v-for="tag in sortedTags" :key=tag.order>
-            <HeaderText v-if="tag.type == 'String'" :placeholder=tag.label></HeaderText>
+            <HeaderText v-if="tag.type == 'String'" @onInput="(text) => emit('onUpdateFilter', text, tag.id)" :placeholder=tag.label></HeaderText>
             <HeaderTag v-else-if="tag.type == 'Tag'" :name=tag.label></HeaderTag>
             <div v-else-if="tag.type == 'Number'">{{ tag.label }}</div>
         </th>
