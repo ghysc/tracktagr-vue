@@ -1,18 +1,21 @@
 
 <script setup>
-defineProps({
-    placeholder: String
+import { inject } from 'vue'
+
+const props = defineProps({
+    id: String
 });
 
-const emit = defineEmits(['onInput']);
+const tags = inject('tags');
+const currentTag = tags.value.find(tag => tag.id.includes(props.id));
 
 function onInput(event) {
-    emit('onInput', event.target.value);
+    currentTag.filter = event.target.value;
 }
 </script>
 
 <template>
-    <input type="search" class="search" @input="event => onInput(event)" :placeholder="placeholder" /> <!--oninput="filterText(this)"-->
+    <input type="search" class="search" :placeholder="currentTag.label" @input="event => onInput(event)" />
 </template>
 
 <style>

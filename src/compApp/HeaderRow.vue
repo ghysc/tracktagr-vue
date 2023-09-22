@@ -1,41 +1,33 @@
 
 <script setup>
 import {
-    computed
+    computed,
+    inject
 } from 'vue'
 import HeaderText from './HeaderText.vue'
-import HeaderTag from './HeaderTag.vue'
+import HeaderDropdown from './HeaderDropdown.vue'
 
-const props = defineProps({
-    tags: Array
-});
-
-const emit = defineEmits(['onUpdateFilter']);
+const tags = inject('tags');
 
 // https://vuejs.org/guide/essentials/list.html#displaying-filtered-sorted-results
 const sortedTags = computed(() => {
-    return props.tags.slice().sort(compare);
+    return tags.value.slice().sort((a, b) => {
+    // https://stackoverflow.com/questions/1129216/sort-array-of-objects-by-string-property-value
+        if (a.order < b.order)
+            return -1;
+        else if (a.order > b.order)
+            return 1;
+        return 0;
+    });
 });
-
-// https://stackoverflow.com/questions/1129216/sort-array-of-objects-by-string-property-value
-function compare(a, b) {
-    if (a.order < b.order)
-        return -1;
-    else if (a.order > b.order)
-        return 1;
-    return 0;
-}
 </script>
 
 <template>
-    <!-- <tr v-if="tags.value == undefined" class="header">
-        <th>Please add a tag hhh</th>
-    </tr> -->
     <tr class="header">
         <th v-for="tag in sortedTags" :key=tag.order>
-            <HeaderText v-if="tag.type == 'String'" @onInput="(text) => emit('onUpdateFilter', text, tag.id)" :placeholder=tag.label></HeaderText>
-            <HeaderTag v-else-if="tag.type == 'Tag'" :name=tag.label></HeaderTag>
-            <div v-else-if="tag.type == 'Number'">{{ tag.label }}</div>
+            <HeaderText     v-if="tag.type == 'String'"         :id=tag.id></HeaderText>
+            <HeaderDropdown v-else-if="tag.type == 'Dropdown'"  :id=tag.id></HeaderDropdown>
+            <div            v-else-if="tag.type == 'Number'"> {{ tag.label }} </div>
         </th>
     </tr>
 </template>

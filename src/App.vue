@@ -2,7 +2,8 @@
 <script setup>
 import {
   ref,
-  computed
+  computed,
+  provide
   //watch
 } from 'vue'
 import {
@@ -10,6 +11,8 @@ import {
   onAuthStateChanged
 } from "firebase/auth";
 import DB from './database'
+import DefaultTags from './defaultTags'
+import DefaultTracks from './defaultTracks'
 import AuthDialog from './compGlob/auth/AuthDialog.vue'
 import HeaderRow from './compApp/HeaderRow.vue'
 import TrackRow from './compApp/TrackRow.vue'
@@ -19,29 +22,9 @@ const auth = getAuth();
 let currentUser = undefined;
 
 const userTags = ref([]);
-const defaultTags = [
-  { id: "title", label: "Title", type: "String", order: 0, filter: "" },
-  { id: "artist", label: "Artist(s)", type: "String", order: 1, filter: "" },
-  { id: "duration", label: "Duration", type: "Number", order: 2, filter: 0 }
-];
+provide('tags', userTags);
 
 const userTracks = ref([]);
-const track01 = {
-  id: 0,
-  tags: [
-    { key: "title", value: "Setting Sun" },
-    { key: "artist", value: "George FitzGerald" },
-    { key: "duration", value: 374 }
-  ]
-};
-const track02 = {
-  id: 1,
-  tags: [
-    { key: "title", value: "Otona Blue" },
-    { key: "artist", value: "Atarashii Gakko!" },
-    { key: "duration", value: 191 }
-  ]
-};
 
 // Callback method automatically called when Firebase Authentification state changes 
 onAuthStateChanged(auth, async userAuth => {
@@ -53,11 +36,11 @@ onAuthStateChanged(auth, async userAuth => {
 
     // If they doesn't exist, create them
     if (userDB == undefined) {
-      await DB.createUser(currentUser, defaultTags);
+      await DB.createUser(currentUser, DefaultTags.tags);
 
       // TEMP manually add default tracks
-      await DB.addTrack(currentUser, track01);
-      await DB.addTrack(currentUser, track02);
+      await DB.addTrack(currentUser, DefaultTracks.track01);
+      await DB.addTrack(currentUser, DefaultTracks.track02);
     }
 
     // Add user's tags to page
@@ -94,6 +77,18 @@ const filteredTracks = computed(() => {
           return trackTag.value.toLowerCase().includes(tag.filter.toLowerCase());
         case "Number":
           return Number(trackTag.value) >= Number(tag.filter);
+        case "Dropdown":
+          // Si aucun filtre du dropdown n'est activé, alors afficher la piste
+          if (tag.filter.every(f => f.on == false))
+            return true;
+          // Sinon, la filtrer correctement
+          else {
+            const hasMatch = tag.filter.some(tagDDFilterElement => {
+              return tagDDFilterElement.on &&
+                trackTag.value.some(trackDDFilterElement => trackDDFilterElement.includes(tagDDFilterElement.name));
+            });
+            return hasMatch;
+          }
         default:
           // Si le tag correspondant n'est pas trouvé dans la piste, inclure la piste
           return true;
@@ -101,36 +96,18 @@ const filteredTracks = computed(() => {
     });
   });
 });
-
-//#region HEADER FILTER CALLBACKS
-function onUpdateFilter(filter, tagID) {
-  userTags.value.find(tag => tag.id == tagID).filter = filter;
-}
-//#endregion
-
-//#region AUTH EMITS CALLBACKS
-function onAuthSignin() {
-}
-
-function onAuthSignout() {
-}
-
-function onAuthFailure(error) {
-  console.error(error.code + ' : ' + error.message);
-}
-//#endregion
 </script>
 
 <template>
   <header>
     <img src="./assets/logo.png">
-    <AuthDialog @onSignin="onAuthSignin" @onSignout="onAuthSignout" @onFailure="onAuthFailure"></AuthDialog>
+    <AuthDialog></AuthDialog>
   </header>
 
   <table id="table">
-    <HeaderRow :tags="userTags" @onUpdateFilter="onUpdateFilter"></HeaderRow>
+    <HeaderRow></HeaderRow>
 
-    <TrackRow v-for="track in filteredTracks" :tags="userTags" :track=track :key=track.id></TrackRow>
+    <TrackRow v-for="track in filteredTracks" :track=track :key=track.id></TrackRow>
   </table>
 </template>
 

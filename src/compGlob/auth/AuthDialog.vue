@@ -9,7 +9,8 @@ import AuthGoogle from './AuthGoogle.vue'
 import AuthSignout from './AuthSignout.vue'
 const emits = defineEmits(['onSignin', 'onSignout', 'onFailure']);
 
-const authDialogButtonOpen = ref("authDialogButtonOpen");
+const authDialogButtonOpenClass = ref("authDialogButtonOpenClass");
+const authDialogClass = ref("authDialogClass");
 const authDialogElement = ref(null);
 
 function onSignin(userCredential) {
@@ -30,7 +31,11 @@ function onFailure(error) {
 </script>
 
 <template>
-    <dialog ref="authDialogElement">
+    <button :class="authDialogButtonOpenClass" @click="authDialogElement.showModal()">
+        My Profile
+    </button>
+
+    <dialog :class="authDialogClass" ref="authDialogElement">
         <div v-show="useCurrentUser().value == null">
             <AuthEmailPassword @onSuccess="onSignin" @onFailure="onFailure"></AuthEmailPassword>
             <br />
@@ -45,31 +50,15 @@ function onFailure(error) {
         </div>
         <button @click="authDialogElement.close()">Close</button>
     </dialog>
-
-    <a :class="authDialogButtonOpen" @click="authDialogElement.showModal()">My Profile</a>
 </template>
 
-<style>
-dialog {
-    display: flex;
-    flex-direction: column;
-    opacity: 0;
-    scale: 0;
-    display: block;
-    transition: all .5s;
-}
-
-dialog[open] {
-    opacity: 1;
-    scale: 2;
-}
-
-dialog::backdrop {
+<style scoped>
+.authDialogClass::backdrop {
     background-blend-mode: screen;
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.authDialogButtonOpen {
+.authDialogButtonOpenClass {
     float: right;
     color: black;
     text-align: center;
@@ -80,12 +69,12 @@ dialog::backdrop {
     border-radius: 4px;
 }
 
-.authDialogButtonOpen:hover {
+.authDialogButtonOpenClass:hover {
   background-color: #ddd;
   color: black;
 }
 
-.authDialogButtonOpen.active {
+.authDialogButtonOpenClass.active {
   background-color: dodgerblue;
   color: white;
 }

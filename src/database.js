@@ -60,4 +60,4 @@ async function addTrack(user, track) {
     return trackSnap.data();
 }
 
-export default { retrieveUser, createUser, processTags, processTracks, addTrack };
+export default { retrieveUser, createUser, processTags, processTracks, addTrack }
